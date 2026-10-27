@@ -1,0 +1,167 @@
+# Tab Tailor
+
+Rearrange, rename, hide and refill creative mode tabs, and split long tabs into titled sections
+(header rows like in Create: Aeronautics). Everything is configured with small JSON files that may
+contain comments, and can be reloaded in game.
+
+- Minecraft 1.21.1, NeoForge 21.1.264+
+- Client side only. Servers do not need it, players without it see the normal tabs.
+- License: MIT, free to use in modpacks
+
+## Files
+
+All files live in `config/tabtailor/` and are created on first start.
+
+| File | Purpose |
+|---|---|
+| `tabtailor.json` | Tab order, hidden tabs, items hidden everywhere, default section colors |
+| `tabs/*.json` | One file per tab: title, icon, contents, sections |
+| `tabs/_example.json` | Commented example. Files starting with `_` are ignored |
+| `export/` | Written by `/tabtailor export`. Copy a file into `tabs/` to start from a tab's current contents |
+
+## In-game editor
+
+Open it with `/tabtailor edit` or the **Config** button of Tab Tailor in the mod list.
+
+- Drag tabs to sort them (or select one and use Shift + arrow keys), click **On/Off** to hide or show a tab
+- Change a tab's title and icon (empty = the mod's own)
+- **Open tab file** opens (or creates) the file of the selected tab for sections and contents
+- **Edit sections** opens the section editor of the selected tab:
+  - sections on the left: drag to sort, **+ New**, **Delete**, or **Split into sections** for a tab without any
+  - in the middle the selected section: title, side bar icon, its entries (**Items**) and what it must not take
+    (**Except**); drag entries to sort, **x** removes one, type any entry (`@mod`, `#tag`, wildcards, ...) below
+  - on the right an item picker (search by name, ID, `@mod` or `#tag`): left click adds the item, right click the
+    whole mod; green = already in this section, gray = already in this tab
+  - **Preview** shows the tab as it would look, with item counts per section and problems
+  - other settings of a section (colors, image, ...) are kept; comments inside `"sections"` are not
+- **Look of this tab**, **Global look** and **Look of this section** (in the section editor) edit colors and
+  images: section headers (background, text, line, shadow, image and its animation), the side bar and the
+  window (background, title color, slot highlight, scroll bar). Color picker with alpha, hex input, image list
+  from `config/tabtailor/images/`, live preview. **Inherit** removes a value so the next level applies
+  (section, tab, global, built-in default).
+- **Save** writes `tabtailor.json` and the tab files and reloads right away. Only the changed values are
+  replaced, comments and all other settings in the files stay as they are. A copy of every changed file is
+  kept in `config/tabtailor/_backup/`.
+
+## Commands
+
+All commands run on the client and need no cheats.
+
+| Command | What it does |
+|---|---|
+| `/tabtailor edit` | Opens the in-game editor |
+| `/tabtailor reload` | Reads all files again, rebuilds the tabs and lists problems (typos, unknown items) |
+| `/tabtailor list` | All tab IDs in display order, page by page. Click an ID to copy it |
+| `/tabtailor export <tab>` / `all` | Writes the current contents of a tab as a ready-to-edit tab file |
+| `/tabtailor id` | ID, mod and tags of the item in your hand. Click to copy |
+
+New tabs (`"new_tab": true`) need one game restart, everything else works with `/tabtailor reload`.
+
+## Item syntax
+
+Used in `items`, `add`, `remove`, `exclude` and `hidden_items`.
+
+| Entry | Meaning |
+|---|---|
+| `minecraft:stone` | One item, with all its variants (e.g. every potion for `minecraft:potion`) |
+| `create:*_casing` | Wildcard on item IDs |
+| `@create` | Every item of a mod, in its creative tab order |
+| `#c:ingots` | Item tag |
+| `tab:create:base` | Everything that is normally in that tab |
+| `*` | Everything normally in *this* tab that was not placed in another section |
+| `!@minecraft` | "Not". Mainly for `remove`/`exclude`, e.g. keep only vanilla items in a vanilla tab |
+
+When an item matches several entries of one tab, exact IDs win, then the first matching section,
+and `*` comes last. Broad entries (`@mod`, wildcards, tags) look at items that appear in some creative tab. If a mod or
+wildcard finds nothing there (some mods put their items in no tab at all), all registered items that
+match are used instead. Exact IDs always work.
+
+## Tab file
+
+```jsonc
+{
+  "tab": "farbound:vehicles",      // tab to change, see /tabtailor list
+  "new_tab": true,                 // create it (restart needed)
+  "title": "Vehicles",             // or { "translate": "some.lang.key" }
+  "icon": "aeronautics:propeller_bearing",
+  "exclusive": true,               // take these items out of all other tabs (search keeps them)
+
+  "sections": [
+    { "title": "Propulsion", "icon": "aeronautics:propeller_bearing",
+      "items": [ "aeronautics:propeller_bearing", "@createpropulsion" ] },
+    { "title": "Wheels", "items": [ "@offroad" ], "exclude": [ "offroad:some_block" ],
+      "background": "#AA324136", "color": "#FFE5DCD0" }
+  ],
+  "remove": [ ]
+}
+```
+
+Without `sections` you can write a plain list (`"items": [...]`) or keep the tab's normal contents
+and only change a bit (`"add": [...]`, `"remove": [...]`).
+
+With two or more sections, a gray bar with one slot per section appears on the left side of the creative
+window (icon = section `icon`, otherwise its first item). Click to jump, hover for the title.
+At most 5 slots are shown; the arrow buttons (orange while there is more) and the mouse wheel scroll the bar.
+
+Compatibility: in every tab that has a Tab Tailor file, side bars of other mods (Let's Do side tabs of
+Furniture, BloomingNature, ...; Vanilla Backport's bundled tabs) are switched off so they do not fight
+with Tab Tailor's bar or filter the items. Create Simulated / Aeronautics, Create Propulsion and Create Flight Control draw their own section banners;
+in tabs whose contents Tab Tailor changes, those are switched off and Tab Tailor's sections are used
+(their banner textures still work as `image`, e.g. `"simulated:textures/gui/sprites/banner.png"`).
+REMI's creative tab browser
+uses Tab Tailor's tab order and hidden tabs and re-reads the tab contents after `/tabtailor reload`. Turn off with `"section_tabs": false` in
+`tabtailor.json`. EMI keeps its panels clear of these tabs.
+
+Section look: `background`, `color` (text), `line` (bottom line), `shadow` (text shadow),
+`image` (a picture behind the header: a PNG in `config/tabtailor/images/`, e.g. `"image": "holz.png"`,
+or a texture ID like `"farbound:textures/gui/holz.png"`; stretched to 162 x 18, so use that size or a
+multiple) and `sprite` (a GUI sprite from a resource pack).
+
+Animated header images: put the frames below each other in one PNG (4 frames of 324 x 36 make a 324 x 144
+file). The frame count is detected from the 9:1 header shape, or set `"image_frames"`. Speed:
+`"image_frametime"` in ticks per frame (default 2). `"image_hover_only": true` only animates while the
+mouse is over the header. A Minecraft style `holz.png.mcmeta` with `{"animation": {"frametime": 3, "height": 36}}`
+next to the image works too.
+
+Window look: by default every normal tab uses the plain vanilla creative window, so mods cannot give
+their tab a different background or colors. Change it with `"tab_style"` in `tabtailor.json` (all tabs)
+or in a tab file (that tab only): `background` (`"vanilla"`, `"mod"` to keep the mod's own, a PNG in
+`config/tabtailor/images/` or a texture ID; 256 x 256 like vanilla `tab_items.png`), `label_color`,
+`slot_highlight`, `scroller` (`"vanilla"`, `"mod"` or a sprite ID), `keep_mod_colors`.
+
+Bar colors: `"sidebar": { ... }` in `tabtailor.json` for all tabs, or in a tab file for that tab only.
+Keys: `background`, `slot`, `background_active`, `border_active`, `button`, `button_active`, `arrow`,
+`arrow_active`. Light and dark edges are derived from these colors automatically. Colors are `#RRGGBB` or
+`#AARRGGBB`. Set them per section, per tab (`"section_style": {...}`) or globally in `tabtailor.json`.
+
+## Main file
+
+```jsonc
+{
+  "tab_order": [ "@minecraft", "create:base", "farbound:*", "*" ],  // "*" = all others
+  "hidden_tabs": [ "createdeco:props_tab", "@copycats" ],           // still searchable
+  "show_hidden_tabs": false,                                        // true = show them again, list stays
+  "hidden_items": [ "minecraft:debug_stick" ],                      // gone everywhere, search too
+  "section_tabs": true,                                             // jump tabs on the left
+  "section_style": { "background": "#AA2B2B2B", "color": "#FFF0F0F0" }
+}
+```
+
+## Building
+
+```
+./gradlew build
+```
+
+The jar ends up in `build/libs/`. Every push is also built by GitHub Actions (see the Actions tab for the jar).
+
+See [CHANGELOG.md](CHANGELOG.md) for the version history.
+
+## How it works
+
+- Tab contents are rewritten right after Minecraft builds the normal tabs and before the search tab
+  is built, so search always knows about moved items.
+- Sections are padding: each section starts on a new row of 9, a titled section gets an empty
+  header row on which the title is drawn. Clicks on header rows are ignored.
+- Order and hiding are applied to NeoForge's sorted tab list, which the creative screen pages are
+  built from. Search, hotbar, inventory and operator tabs stay on every page.

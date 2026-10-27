@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.definitivtim.tabtailor.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "CreativeModeInventoryScreenAccessor",
+    "CreativeModeInventoryScreenMixin",
+    "CreativeModeTabAccessor",
+    "CreativeModeTabMixin",
+    "CreativeModeTabRegistryAccessor",
+    "CreativeModeTabRegistryMixin",
+    "CreativeModeTabsAccessor",
+    "CreativeModeTabsMixin",
+    "ItemPickerMenuAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

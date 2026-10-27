@@ -1,0 +1,17 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "io.github.definitivtim.tabtailor.compat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "FlightCreativeTabSectionRendererMixin",
+    "FoundationSideTabsMixin",
+    "PropulsionCreativeTabRendererMixin",
+    "RemiCreativeModeTabManagerMixin",
+    "SimulatedCreativeTabMixin",
+    "VanillaBackportBundledTabsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}
