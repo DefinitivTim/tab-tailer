@@ -9,7 +9,7 @@ displayName="${mod_name}"
 authors="${mod_authors}"
 description='''${mod_description}'''
 logoFile="tabtailor_logo.png"
-logoBlur=false
+logoBlur=true
 
 [[mixins]]
 config="${mod_id}.mixins.json"
