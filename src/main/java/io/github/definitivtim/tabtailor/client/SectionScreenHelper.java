@@ -43,6 +43,8 @@ public final class SectionScreenHelper {
     /** The layout {@link #current} was padded with; after /tabtailor reload the tab gets a new one. */
     private static @Nullable SectionLayout currentLayout;
     private static int sideScroll;
+    private static int lastActiveSection = -1;
+    private static @Nullable SectionLayout.Padded lastActiveLayout;
     /**
      * Section the player clicked last, and the grid scroll that click produced. Near the end of a tab the grid
      * cannot scroll far enough to put the clicked header at the top, so "top row" alone would mark the section above.
@@ -390,6 +392,17 @@ public final class SectionScreenHelper {
             selected = pinnedSection;
         } else {
             pinnedSection = -1;
+        }
+        // keep the active section in view when it changes (scrolling the grid); manual bar scrolling stays possible
+        if (selected != lastActiveSection || current != lastActiveLayout) {
+            lastActiveSection = selected;
+            lastActiveLayout = current;
+            if (selected < bar.first()) {
+                sideScroll = selected;
+            } else if (selected >= bar.first() + bar.visible()) {
+                sideScroll = selected - bar.visible() + 1;
+            }
+            bar = bar(sections.size(), leftPos, topPos, screenHeight);
         }
         int hovered = hit(bar, sections.size(), mouseX, mouseY);
         SidebarStyle style = sidebarStyle(tab);

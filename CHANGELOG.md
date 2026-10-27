@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+### Fixes
+- The section side bar now scrolls along with the item grid, so the active section stays visible when a tab has more than 5 sections
+
 ## 1.0.0
 
 First public release. Written with AI assistance (Claude by Anthropic), see the AI notice in the README.
