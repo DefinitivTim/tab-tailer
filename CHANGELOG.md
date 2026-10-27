@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-First public release.
+First public release. Written with AI assistance (Claude by Anthropic), see the AI notice in the README.
 
 ### Tabs
 - Reorder and hide creative tabs (`tab_order`, `hidden_tabs`), hide items everywhere (`hidden_items`)
