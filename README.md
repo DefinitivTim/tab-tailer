@@ -1,3 +1,5 @@
+<img src="logo.png" width="128" alt="Tab Tailor logo">
+
 # Tab Tailor
 
 Rearrange, rename, hide and refill creative mode tabs, and split long tabs into titled sections
